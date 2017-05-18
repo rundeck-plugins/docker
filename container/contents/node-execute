@@ -14,6 +14,7 @@ log = logging.getLogger('docker-node-executor')
 
 parser = argparse.ArgumentParser(
     description='Execute a command string in the container.')
+parser.add_argument('container', help='the container ID')
 parser.add_argument('user', help='the user ID')
 parser.add_argument('command', help='the command string to execute')
 args = parser.parse_args()
@@ -34,7 +35,7 @@ if "RD_CONFIG_DOCKER_CERT_PATH" in os.environ:
         log.debug("RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.")
 
 
-log.info("Executing command string: '" + args.command + '" ...')
+log.info("Executing command string '%s' on container '%s' ..." % (args.command, args.container))
 
 p = Popen('docker exec %s %s' % (args.container, args.command),
           shell=True, stdout=PIPE, stderr=PIPE)

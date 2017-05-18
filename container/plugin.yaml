@@ -59,7 +59,7 @@ providers:
     plugin-type: script
     script-interpreter: python -u
     script-file: node-execute
-    script-args: ${config.container} ${config.user} ${config.command}
+    script-args: ${node.docker:Id} ${node.username} ${exec.command}
     config:
       - type: String
         name: docker-cert-path
@@ -78,15 +78,6 @@ providers:
         name: container
         title: 'container'
         description: "the container to dispatch."    
-      - type: String
-        name: command
-        title: 'command'
-        description: "the command string to execute."
-      - type: String
-        name: user
-        title: 'User'
-        description: "User to execute command as."
-        default: root
   - name: docker-container-model-source
     service: ResourceModelSource
     resource-format: resourcejson
