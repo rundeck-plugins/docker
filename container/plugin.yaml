@@ -1,0 +1,120 @@
+name: docker-container-node-executor
+version: 1.0.0
+rundeckPluginVersion: 1.2
+author: alexh
+date: Thu Aug  6 19:32:08 PDT 2015
+providers:
+  - name: docker-container-execute-command
+    service: WorkflowNodeStep
+    title: docker / container / execute command
+    description: 'execute the command'
+    plugin-type: script
+    script-interpreter: python -u
+    script-file: node-execute
+    script-args: ${config.container} ${config.user} ${config.command}
+    config:
+      - type: String
+        name: container
+        title: 'container'
+        description: "the container to dispatch"
+        required: true
+      - type: String
+        name: command
+        title: 'command'
+        description: "the command string to execute"
+        required: true
+      - type: String
+        name: user
+        title: 'User'
+        description: "User to execute command as."
+        default: root
+        required: true
+      - type: String
+        name: docker-cert-path
+        title: 'docker-cert-path'
+        description: "the certificate path"
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
+      - type: String
+        name: docker-host
+        title: 'docker-host'
+        description: "the docker host"
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
+      - type: Select
+        name: docker-tls-verify
+        title: 'docker-tls-verify'
+        description: "verify TLS"
+        default: '1'
+        values: 1,0
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
+  - name: docker-container-node-executor
+    service: NodeExecutor
+    title: docker-container-node-executor
+    description: 'dispatch the command'
+    plugin-type: script
+    script-interpreter: python -u
+    script-file: node-execute
+    script-args: ${config.container} ${config.user} ${config.command}
+    config:
+      - type: String
+        name: docker-cert-path
+        title: 'docker-cert-path'
+        description: "the certificate path"
+      - type: String
+        name: docker-host
+        title: 'docker-host'
+        description: "the docker host"
+      - type: Select
+        name: docker-tls-verify
+        title: 'docker-tls-verify'
+        description: "verify TLS"
+        values: 1,0
+      - type: String
+        name: container
+        title: 'container'
+        description: "the container to dispatch."    
+      - type: String
+        name: command
+        title: 'command'
+        description: "the command string to execute."
+      - type: String
+        name: user
+        title: 'User'
+        description: "User to execute command as."
+        default: root
+  - name: docker-container-model-source
+    service: ResourceModelSource
+    resource-format: resourcejson
+    title: docker / container / model
+    description: 'read docker containers as Nodes'
+    plugin-type: script
+    script-interpreter: python -u
+    script-file: model-source
+    script-args: ${config.attributes} ${config.tags}
+    config:
+      - type: String
+        name: docker-cert-path
+        title: 'docker-cert-path'
+        description: "the certificate path"
+      - type: String
+        name: docker-host
+        title: 'docker-host'
+        description: "the docker host"
+      - type: Select
+        name: docker-tls-verify
+        title: 'docker-tls-verify'
+        description: "verify TLS"
+        values: 1,0
+      - type: String
+        name: attributes
+        title: 'Default attributes'
+        description: "List of key=value pairs"
+      - type: String
+        name: tags
+        title: Tags
+        description: "List of tags"
