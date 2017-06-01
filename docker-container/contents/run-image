@@ -52,12 +52,14 @@ if "RD_CONFIG_DOCKER_CERT_PATH" in os.environ:
         log.debug("RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.")
 
 if args.command in {'${option.command}', '${config.command}'}:
-    args.command = ""
+    args.command = None
 
 COMMAND = ['docker', 'run']
 COMMAND.extend(OPTIONS)
 COMMAND.append(args.image)
-COMMAND.append(args.command)
+
+if args.command is not None:
+    COMMAND.append(args.command)
 
 command_string = " ".join(COMMAND)
 log.info("Executing: '" + command_string + "' ...")
