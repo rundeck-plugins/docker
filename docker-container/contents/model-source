@@ -10,13 +10,13 @@ import json
 import shlex
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO,
+logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                     format='%(levelname)s: %(name)s: %(message)s')
 log = logging.getLogger('container-model-source')
 
 
 def nodeCollectData(containerId, json, defaults, taglist):
-    log.debug("Collecting data for container %s" % containerId)
+    log.debug("Parsing json data for container: %s" % containerId)
     tags = ["docker"]
     tags.extend(taglist.split(","))
     data = {
@@ -41,6 +41,9 @@ def nodeCollectData(containerId, json, defaults, taglist):
     return data
 
 
+if os.environ.get('RD_CONFIG_DEBUG') == 'true':
+    log.setLevel(logging.DEBUG)
+    log.debug("Log level configured for DEBUG")
 
 parser = argparse.ArgumentParser(
     description='Execute a command string in the container.')
@@ -64,12 +67,14 @@ if "RD_CONFIG_DOCKER_CERT_PATH" in os.environ:
         log.debug("RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.")
 
 # Get a listing of the docker containers
+log.debug("Executing `docker ps --format {{.ID}}` ...")
 ps = Popen('docker ps --format "{{.ID}}"',
            shell=True, stdout=PIPE, stderr=PIPE,
            bufsize=1, universal_newlines=True)
 exitcode = ps.wait()
 if exitcode != 0:
     log.error("Failure from docker ps command (exitcode: %s)" % str(exitcode))
+    sys.exit(1)
 
 
 containers = ps.stdout.readlines()
@@ -77,7 +82,7 @@ log.debug('Processing %d containers ...' % len(containers))
 node_set = []
 
 for container in containers:
-    log.debug('Inspecting container: %s ...' % container)
+    log.debug('Inspecting container: %s' % container)
     inspect = Popen('docker inspect %s ' % container,
                     shell=True, stdout=PIPE, stderr=PIPE,
                     bufsize=1, universal_newlines=True)

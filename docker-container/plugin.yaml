@@ -109,6 +109,10 @@ providers:
         name: tags
         title: Tags
         description: "List of tags"
+      - type: Boolean
+        name: debug
+        title: Debug?
+        description: "Write debug messages to stderr"        
   - name: docker-container-inspect-workflow-step
     service: WorkflowNodeStep
     title: docker / container / inspect
