@@ -22,7 +22,7 @@ args = parser.parse_args()
 
 possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'cpu-shares', 'cpu-period', 'cpuset-cpus', 'cpuset-mems',
-                 'cpu-quota', 'detatch', 'device', 'dns', 'env', 'interactive', 'ipc',
+                 'cpu-quota', 'detach', 'device', 'dns', 'env', 'interactive', 'ipc',
                  'label', 'log-driver', 'log-opt', 'lxc-conf', 'memory',
                  'memory-swap', 'name', 'net', 'oom-kill-disable', 'publish',
                  'privileged', 'restart', 'rm', 'security-opt',

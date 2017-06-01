@@ -231,8 +231,8 @@ providers:
         title: 'cpuset-mems'
         description: "Memory nodes (MEMs) in which to allow execution (0-3, 0,1)"
       - type: Select
-        name: detatch
-        title: 'detatch'
+        name: detach
+        title: 'detach'
         description: "Run container in background and print container ID"
         values: true,false
       - type: String
