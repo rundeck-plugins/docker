@@ -12,3 +12,9 @@ Three providers in this plugin:
   * unpause
   * stats
 
+## To build and install
+
+Run the following commands to install the plugins:
+
+    zip -r docker-container.zip docker-container
+    cp docker-container.zip $RDECK_BASE/libext
