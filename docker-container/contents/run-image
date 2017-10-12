@@ -5,7 +5,7 @@ import logging
 import sys
 import os
 from subprocess import Popen, PIPE
-import subprocess
+
 
 formatter = logging.Formatter()
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
@@ -22,12 +22,11 @@ args = parser.parse_args()
 
 possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'cpu-shares', 'cpu-period', 'cpuset-cpus', 'cpuset-mems',
-                 'cpu-quota', 'detach', 'device', 'dns', 'env', 'interactive', 'ipc',
-                 'label', 'log-driver', 'log-opt', 'lxc-conf', 'memory',
+                 'cpu-quota', 'detach', 'device', 'dns', 'env', 'interactive',
+                 'ipc', 'label', 'log-driver', 'log-opt', 'lxc-conf', 'memory',
                  'memory-swap', 'name', 'net', 'oom-kill-disable', 'publish',
                  'privileged', 'restart', 'rm', 'security-opt',
-                 'volume', 'volume-from', 'ulimit', 'uts',
-                 'interactive', 'tty']
+                 'volume', 'volume-from', 'ulimit', 'uts', 'tty']
 OPTIONS = []
 for opt in possible_opts:
     env_var_name = "RD_CONFIG_" + opt.upper().replace('-', '_')
@@ -66,7 +65,10 @@ log.info("Executing: '" + command_string + "' ...")
 # exitcode = subprocess.check_output(command_string, shell=True)
 p = Popen(command_string, shell=True, stdout=PIPE, stderr=PIPE)
 exitcode = p.wait()
-print p.stdout.read()
+
+log.info("Command execution stdout: '" + p.stdout.read() + "' ...")
+log.info("Command execution stderr: '" + p.stderr.read() + "' ...")
+
 if exitcode != 0:
     log.error("Command execution failed with exit code: %s" % str(exitcode))
 

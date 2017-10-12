@@ -36,7 +36,8 @@ p = Popen('docker unpause %s' % (args.container),
           shell=True, stdout=PIPE, stderr=PIPE)
 exitcode = p.wait()
 
-print p.stdout.read()
+log.info("Command execution stdout: '" + p.stdout.read() + "' ...")
+log.info("Command execution stderr: '" + p.stderr.read() + "' ...")
 
 if exitcode != 0:
     log.error("Command execution failed with exit code: %s" % str(exitcode))
