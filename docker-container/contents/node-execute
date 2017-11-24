@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import shlex
 import sys
 import os
 from subprocess import Popen, PIPE
@@ -37,8 +38,8 @@ if "RD_CONFIG_DOCKER_CERT_PATH" in os.environ:
 
 log.info("Executing command string '%s' in container '%s' ..." % (args.command, args.container))
 
-p = Popen('docker exec %s %s' % (args.container, args.command),
-          shell=True, stdout=PIPE, stderr=PIPE)
+p = Popen(shlex.split('docker exec %s %s' % (args.container, args.command)),
+          shell=False, stdout=PIPE, stderr=PIPE)
 exitcode = p.wait()
 
 log.info("Command execution stdout: '" + p.stdout.read() + "' ...")
