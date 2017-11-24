@@ -1,5 +1,5 @@
 name: docker-container-node-executor
-version: 1.0.0
+version: 1.1.0
 rundeckPluginVersion: 1.2
 author: alexh
 date: Thu Aug  6 19:32:08 PDT 2015
@@ -77,7 +77,7 @@ providers:
       - type: String
         name: container
         title: 'container'
-        description: "the container to dispatch."    
+        description: "the container to dispatch."
   - name: docker-container-model-source
     service: ResourceModelSource
     resource-format: resourcejson
@@ -112,7 +112,7 @@ providers:
       - type: Boolean
         name: debug
         title: Debug?
-        description: "Write debug messages to stderr"        
+        description: "Write debug messages to stderr"
   - name: docker-container-inspect-workflow-step
     service: WorkflowNodeStep
     title: docker / container / inspect
@@ -136,7 +136,7 @@ providers:
     config:
       - type: String
         name: container
-        description: "The container ID"   
+        description: "The container ID"
   - name: docker-container-unpause-step
     service: WorkflowNodeStep
     title: docker / container / unpause
@@ -209,7 +209,7 @@ providers:
       - type: String
         name: cidfile
         title: 'cidfile'
-        description: "Write the container ID to the file"        
+        description: "Write the container ID to the file"
       - type: String
         name: command
         title: 'command'
