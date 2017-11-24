@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import shlex
 import sys
 import os
 
@@ -83,8 +84,8 @@ node_set = []
 
 for container in containers:
     log.debug('Inspecting container: %s' % container)
-    inspect = Popen('docker inspect %s ' % container,
-                    shell=True, stdout=PIPE, stderr=PIPE,
+    inspect = Popen(shlex.split('docker inspect %s ' % container),
+                    shell=False, stdout=PIPE, stderr=PIPE,
                     bufsize=1, universal_newlines=True)
     inspect_json = json.load(inspect.stdout)
     node_data = nodeCollectData(container.rstrip('\n'),
