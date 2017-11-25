@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import shlex
 import sys
 import os
 from subprocess import Popen, PIPE
@@ -28,12 +29,21 @@ possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'privileged', 'restart', 'rm', 'security-opt',
                  'volume', 'volume-from', 'ulimit', 'uts', 'tty']
 OPTIONS = []
+
+for env_var_name, env_var_value in os.environ.iteritems():
+    if (env_var_name.startswith('RD_OPTION') or
+       env_var_name.startswith('RD_NODE') or
+       env_var_name.startswith('RD_JOB')) and \
+       env_var_value:
+        OPTIONS.append("--env=%s='%s'" % (env_var_name, env_var_value))
+        log.debug("appended option: --env=%s='%s'" % (env_var_name, env_var_value))
+
 for opt in possible_opts:
     env_var_name = "RD_CONFIG_" + opt.upper().replace('-', '_')
     if env_var_name in os.environ:
-        OPTIONS.append("--%s=%s" % (opt, os.environ[env_var_name]))
-        log.debug("appended option: --%s=%s" % (opt, os.environ[env_var_name]))
-
+        for env_var_value in shlex.split(os.environ[env_var_name]):
+            OPTIONS.append("--%s='%s'" % (opt, env_var_value))
+            log.debug("appended option: --%s='%s'" % (opt, env_var_value))
 
 if "RD_CONFIG_DOCKER_HOST" in os.environ:
     os.environ["DOCKER_HOST"] = os.environ["RD_CONFIG_DOCKER_HOST"]
@@ -63,7 +73,7 @@ if args.command is not None:
 command_string = " ".join(COMMAND)
 log.info("Executing: '" + command_string + "' ...")
 # exitcode = subprocess.check_output(command_string, shell=True)
-p = Popen(command_string, shell=True, stdout=PIPE, stderr=PIPE)
+p = Popen(shlex.split(command_string), shell=False, stdout=PIPE, stderr=PIPE)
 exitcode = p.wait()
 
 log.info("Command execution stdout: '" + p.stdout.read() + "' ...")
