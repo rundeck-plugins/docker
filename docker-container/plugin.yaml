@@ -348,6 +348,10 @@ providers:
         title: 'interactive'
         description: "Keep STDIN open even if not attached"
         values: true,false
+      - type: String
+        name: workdir
+        title: 'working-directory'
+        description: "Working directory inside the container"  
       - type: Select
         name: tty
         title: 'tty'
