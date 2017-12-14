@@ -1,5 +1,4 @@
 #!/usr/bin/env python -u
-
 import argparse
 import logging
 import shlex
@@ -7,27 +6,32 @@ import sys
 import os
 from subprocess import Popen, PIPE
 
+if os.environ.get('RD_CONFIG_DEBUG') == 'true':
+    log_level = 'DEBUG'
+else:
+    log_level = 'ERROR'
 
-formatter = logging.Formatter()
-logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-                    format='%(levelname)s: %(name)s: %(message)s')
+logging.basicConfig(
+    stream=sys.stdout,
+    level=getattr(logging, log_level),
+    format='%(levelname)s: %(name)s: %(message)s'
+)
 log = logging.getLogger('docker-run')
 
-
 parser = argparse.ArgumentParser(
-    description='Start a container with the specified image.')
+    description='Start a container with the specified image.'
+)
 parser.add_argument('image', help='the image to run')
 parser.add_argument('command', help='the command to run')
 args = parser.parse_args()
-
 
 possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'cpu-shares', 'cpu-period', 'cpuset-cpus', 'cpuset-mems',
                  'cpu-quota', 'detach', 'device', 'dns', 'env', 'interactive',
                  'ipc', 'label', 'log-driver', 'log-opt', 'lxc-conf', 'memory',
                  'memory-swap', 'name', 'net', 'oom-kill-disable', 'publish',
-                 'privileged', 'restart', 'rm', 'security-opt',
-                 'volume', 'volume-from', 'ulimit', 'uts', 'tty','workdir']
+                 'privileged', 'restart', 'rm', 'security-opt', 'volume',
+                 'volume-from', 'ulimit', 'uts', 'tty', 'workdir', 'user']
 OPTIONS = []
 
 for env_var_name, env_var_value in os.environ.iteritems():
@@ -36,29 +40,38 @@ for env_var_name, env_var_value in os.environ.iteritems():
        env_var_name.startswith('RD_JOB')) and \
        env_var_value:
         OPTIONS.append("--env=%s='%s'" % (env_var_name, env_var_value))
-        log.debug("appended option: --env=%s='%s'" % (env_var_name, env_var_value))
+        log.debug(
+            "appended option: --env=%s='%s'" % (env_var_name, env_var_value)
+        )
 
 for opt in possible_opts:
-    env_var_name = "RD_CONFIG_" + opt.upper().replace('-', '_')
+    env_var_name = "RD_CONFIG_%s" % opt.upper().replace('-', '_')
     if env_var_name in os.environ:
         for env_var_value in shlex.split(os.environ[env_var_name]):
             OPTIONS.append("--%s='%s'" % (opt, env_var_value))
             log.debug("appended option: --%s='%s'" % (opt, env_var_value))
 
-if "RD_CONFIG_DOCKER_HOST" in os.environ:
-    os.environ["DOCKER_HOST"] = os.environ["RD_CONFIG_DOCKER_HOST"]
-    log.info("DOCKER_HOST set to " + os.environ["RD_CONFIG_DOCKER_HOST"])
+if 'RD_CONFIG_DOCKER_HOST' in os.environ:
+    os.environ['DOCKER_HOST'] = os.environ['RD_CONFIG_DOCKER_HOST']
+    log.debug('DOCKER_HOST set to %s' % os.environ['RD_CONFIG_DOCKER_HOST'])
 else:
-    log.debug("RD_CONFIG_DOCKER_HOST environment variable not defined.")
+    log.debug('RD_CONFIG_DOCKER_HOST environment variable not defined.')
 
-if "RD_CONFIG_DOCKER_CERT_PATH" in os.environ:
-    os.environ["DOCKER_CERT_PATH"] = os.environ["RD_CONFIG_DOCKER_CERT_PATH"]
-    log.info("DOCKER_CERT_PATH=" + os.environ["RD_CONFIG_DOCKER_CERT_PATH"])
-    if "RD_CONFIG_DOCKER_TLS_VERIFY" in os.environ:
-        os.environ["DOCKER_TLS_VERIFY"] = os.environ["RD_CONFIG_DOCKER_TLS_VERIFY"]
-        log.info("DOCKER_TLS_VERIFY=" + os.environ["RD_CONFIG_DOCKER_TLS_VERIFY"])
-    else:
-        log.debug("RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.")
+if 'RD_CONFIG_DOCKER_CERT_PATH' in os.environ:
+    os.environ['DOCKER_CERT_PATH'] = os.environ['RD_CONFIG_DOCKER_CERT_PATH']
+    log.debug('DOCKER_CERT_PATH=%s' % os.environ['RD_CONFIG_DOCKER_CERT_PATH'])
+else:
+    log.debug('RD_CONFIG_DOCKER_CERT_PATH environment variable not defined.')
+
+if 'RD_CONFIG_DOCKER_TLS_VERIFY' in os.environ:
+    os.environ['DOCKER_TLS_VERIFY'] = os.environ['RD_CONFIG_DOCKER_TLS_VERIFY']
+    log.debug(
+        'DOCKER_TLS_VERIFY=%s' % os.environ['RD_CONFIG_DOCKER_TLS_VERIFY']
+    )
+else:
+    log.debug(
+        'RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.'
+    )
 
 if args.command in {'${option.command}', '${config.command}'}:
     args.command = None
@@ -71,16 +84,24 @@ if args.command is not None:
     COMMAND.append(args.command)
 
 command_string = " ".join(COMMAND)
-log.info("Executing: '" + command_string + "' ...")
-# exitcode = subprocess.check_output(command_string, shell=True)
-p = Popen(shlex.split(command_string), shell=False, stdout=PIPE, stderr=PIPE)
+log.debug("Executing: '%s' ..." % command_string)
+
+p = Popen(
+    shlex.split(command_string),
+    shell=False,
+    stdout=PIPE,
+    stderr=PIPE
+)
 exitcode = p.wait()
 
-log.info("Command execution stdout: '" + p.stdout.read() + "' ...")
-log.info("Command execution stderr: '" + p.stderr.read() + "' ...")
+if log_level == 'DEBUG':
+    log.debug("Command execution stdout: '%s' ..." % p.stdout.read())
+    log.debug("Command execution stderr: '%s' ..." % p.stderr.read())
+else:
+    print(p.stdout.read())
 
 if exitcode != 0:
-    log.error("Command execution failed with exit code: %s" % str(exitcode))
+    log.error('Command execution failed with exit code: %s' % str(exitcode))
 
 # done
 sys.exit(exitcode)
