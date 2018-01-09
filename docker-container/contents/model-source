@@ -19,28 +19,102 @@ logging.basicConfig(
 )
 log = logging.getLogger('container-model-source')
 
+class JsonQuery(dict):
+    def get(self, path, default = None):
+        keys = path.split(".")
+        val = None
 
-def nodeCollectData(containerId, json, defaults, taglist):
+        for key in keys:
+            if val:
+                if isinstance(val, list):
+                    val = [ v.get(key, default) if v else None for v in val]
+                else:
+                    val = val.get(key, default)
+            else:
+                val = dict.get(self, key, default)
+
+            if not val:
+                break;
+
+        return val
+
+
+def nodeCollectData(containerId, json, defaults, taglist, mappingList):
     log.debug('Parsing json data for container: %s' % containerId)
-    tags = ['docker']
+    tags = []
     tags.extend(taglist.split(','))
-    data = {
-        'nodename': containerId,
-        'tags': ','.join(tags),
-        'docker:Id': json[0]["Id"],
-        'docker:Created': json[0]["Created"],
-        'docker:Name': json[0]["Name"],
-        'docker:Image': json[0]["Image"],
-        'docker:State.Status': json[0]["State"]["Status"],
-        'docker:State.Pid': json[0]["State"]["Pid"],
-        'docker:State.StartedAt': json[0]["State"]["StartedAt"],
-        'hostname': json[0]["Config"]["Hostname"],
-        'docker:Config.Image': json[0]["Config"]["Image"],
-        'docker:Config.Hostname': json[0]["Config"]["Hostname"],
-        'docker:Config.Cmd': json[0]["Config"]["Cmd"][0],
-        'docker:Config.Labels': json[0]["Config"]["Labels"],
-        'docker:NetworkSettings.IPAddress': json[0]["NetworkSettings"]["IPAddress"],
+
+    ip=json[0]["NetworkSettings"]["IPAddress"]
+
+    #docker-compose has a different json format
+    if not ip:
+        networkArray=json[0]["NetworkSettings"]["Networks"]
+        for key, value in networkArray.items():
+            ip=value["IPAddress"]
+
+    default_settings = {
+        'default:Id': json[0]["Id"],
+        'default:Created': json[0]["Created"],
+        'default:Name': json[0]["Name"],
+        'default:Image': json[0]["Image"],
+        'default:State.Status': json[0]["State"]["Status"],
+        'default:State.Pid': json[0]["State"]["Pid"],
+        'default:State.StartedAt': json[0]["State"]["StartedAt"],
+        'default:Config.Image': json[0]["Config"]["Image"],
+        'default:Config.Hostname': json[0]["Config"]["Hostname"],
+        'default:Config.Cmd': json[0]["Config"]["Cmd"][0],
+        'default:Config.Labels': json[0]["Config"]["Labels"],
+        'default:IPAddress': ip,
     }
+
+    mappings = []
+    custom_attributes={}
+
+    #custom mapping attributes
+    if mappingList:
+        log.debug('Mapping: %s' % mappingList)
+        mappings.extend(mappingList.split(','))
+
+        for mapping in mappings:
+            mapping_array = dict(s.split('=', 1) for s in mapping.split())
+
+            for key, value in mapping_array.items():
+                if key.find(".selector"):
+
+                    attribute= key.replace(".selector" ,"")
+                    custom_attribute=None
+                    
+                    #take the values from default
+                    if "default:" in value:
+                        custom_attribute=default_settings[value]
+                    else:
+                    #taking the values from docker inspect
+                        for item in json:
+                            custom_attribute=JsonQuery(item).get(value)
+
+                    if custom_attribute:
+                        custom_attributes[attribute] = custom_attribute
+
+        log.debug('Custom Attributes: %s' % custom_attributes)
+
+    # rundeck attributes
+    data = default_settings
+    data['nodename']=containerId
+    data['hostname']=json[0]["Config"]["Hostname"]
+    
+    final_tags = ['docker']
+    for tag in tags:        
+        if "tag.selector=" in tag:
+            custom_tag=data[tag.replace("tag.selector=" ,"")]
+            final_tags.append(custom_tag)
+        else:
+            final_tags.append(tag)
+
+    data['tags'] = ','.join(final_tags)
+
+    if custom_attributes:
+        data = dict(data.items() + custom_attributes.items())
+
     data.update(dict(token.split('=') for token in shlex.split(defaults)))
 
     return data
@@ -49,8 +123,10 @@ def nodeCollectData(containerId, json, defaults, taglist):
 parser = argparse.ArgumentParser(
     description='Execute a command string in the container.'
 )
+
 parser.add_argument('defaults', help='key=value list')
 parser.add_argument('tags', help='comma separated list of additonal tags')
+
 args = parser.parse_args()
 
 if 'RD_CONFIG_DOCKER_HOST' in os.environ:
@@ -74,6 +150,13 @@ else:
     log.debug(
         'RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.'
     )
+
+mappingList=None
+
+if 'RD_CONFIG_MAPPING' in os.environ:
+    mappingList= os.environ['RD_CONFIG_MAPPING']
+
+log.debug('Mapping: %s' % mappingList)
 
 # Get a listing of the docker containers
 log.debug('Executing `docker ps --format {{.ID}}` ...')
@@ -110,7 +193,8 @@ for container in containers:
         container.rstrip('\n'),
         inspect_json,
         args.defaults,
-        args.tags
+        args.tags,
+        mappingList
     )
     node_set.append(node_data)
 

@@ -114,9 +114,13 @@ providers:
         title: 'Default attributes'
         description: 'List of key=value pairs'
       - type: String
+        name: mapping
+        title: 'Custom Mapping'
+        description: 'Custom mapping, eg: nodename.selector=default:Name,hostname.selector=default:IPAddress'
+      - type: String
         name: tags
         title: Tags
-        description: 'List of tags'
+        description: 'List of tags. You can add custom, eg: tag.selector=default:Config.Image'
       - type: Boolean
         name: debug
         title: Debug?
