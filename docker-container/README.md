@@ -20,7 +20,7 @@ Run the following commands to install the plugins:
     cp docker-container.zip $RDECK_BASE/libext
 
 
-## Resource Mode Mapping and Tags
+## Resource Model Mapping and Tags
 
 ### Mapping attributes from default values
 
