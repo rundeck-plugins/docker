@@ -1,6 +1,6 @@
 name: docker-container-node-executor
-version: 1.3.0
-rundeckPluginVersion: 1.4
+version: 1.3.1
+rundeckPluginVersion: 1.2
 author: alexh
 date: Thu Aug 6 19:32:08 PDT 2015
 providers:
