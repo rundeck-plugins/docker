@@ -51,7 +51,6 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        default: '1'
         values: 1,0
         renderingOptions:
           grouping: secondary
