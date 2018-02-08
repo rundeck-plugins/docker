@@ -51,7 +51,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: 1,0
+        values: 1,""
         renderingOptions:
           grouping: secondary
           groupName: 'API Connection'
@@ -414,7 +414,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'verify TLS'
-        values: 1,0
+        values: 1,""
         renderingOptions:
           grouping: secondary
           groupName: 'API Connection'
