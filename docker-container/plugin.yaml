@@ -51,7 +51,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: 1
+        values: true,
         renderingOptions:
           grouping: secondary
           groupName: 'API Connection'
@@ -76,7 +76,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: 1
+        values: true,
       - type: String
         name: container
         title: 'container'
@@ -107,7 +107,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: 1
+        values: true,
       - type: String
         name: attributes
         title: 'Default attributes'
@@ -414,7 +414,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'verify TLS'
-        values: 1
+        values: true,
         renderingOptions:
           grouping: secondary
           groupName: 'API Connection'
