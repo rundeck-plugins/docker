@@ -4,7 +4,7 @@ import logging
 import shlex
 import sys
 import os
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 if os.environ.get('RD_CONFIG_DEBUG') == 'true':
     log_level = 'DEBUG'
@@ -50,7 +50,7 @@ p = Popen(
     shlex.split('docker stats --no-stream --format "%s" %s' % (args.format, args.container)),
     shell=False,
     stdout=PIPE,
-    stderr=PIPE
+    stderr=STDOUT
 )
 exitcode = p.wait()
 
