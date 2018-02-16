@@ -4,7 +4,7 @@ import logging
 import shlex
 import sys
 import os
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 if os.environ.get('RD_CONFIG_DEBUG') == 'true':
     log_level = 'DEBUG'
@@ -57,7 +57,7 @@ p = Popen(
     shlex.split('docker exec %s %s' % (args.container, args.command)),
     shell=False,
     stdout=PIPE,
-    stderr=PIPE
+    stderr=STDOUT
 )
 
 # Print lines to stdout while waiting for command to finish
