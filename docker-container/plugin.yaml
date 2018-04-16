@@ -11,7 +11,7 @@ providers:
     plugin-type: script
     script-interpreter: python -u
     script-file: node-execute
-    script-args: ${config.container} ${config.user} ${config.command}
+    script-args: ${config.container} ${config.command}
     config:
       - type: String
         name: container
