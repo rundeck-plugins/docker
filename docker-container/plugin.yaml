@@ -1,5 +1,5 @@
 name: docker-container-node-executor
-version: 1.3.2
+version: 1.3.3
 rundeckPluginVersion: 1.2
 author: alexh
 date: Thu Aug 6 19:32:08 PDT 2015
@@ -11,7 +11,7 @@ providers:
     plugin-type: script
     script-interpreter: python -u
     script-file: node-execute
-    script-args: ${config.container} ${config.user} ${config.command}
+    script-args: ${config.container} ${config.command}
     config:
       - type: String
         name: container
@@ -23,12 +23,34 @@ providers:
         title: 'command'
         description: 'The command string to execute in the container'
         required: true
+      - type: Select
+        name: detach
+        title: 'detach'
+        description: 'Detached mode: run command in the background'
+        values: true,false
+      - type: String
+        name: env
+        title: 'environment variables'
+        description: 'Set of environment variables'
+      - type: Select
+        name: interactive
+        title: 'interactive'
+        description: 'Keep STDIN open even if not attached'
+        values: true,false
+      - type: Select
+        name: privileged
+        title: 'privileged'
+        description: 'Give extended privileges to the command'
+        values: true,false
+      - type: Select
+        name: tty
+        title: 'tty'
+        description: 'Allocate a pseudo-TTY'
+        values: true,false
       - type: String
         name: user
-        title: 'User'
-        description: 'User to execute command as.'
-        default: root
-        required: true
+        title: 'user'
+        description: 'Username or UID (format: <name|uid>[:<group|gid>])'
       - type: Boolean
         name: debug
         title: Debug?
@@ -80,7 +102,7 @@ providers:
       - type: String
         name: container
         title: 'container'
-        description: 'The container to dispatch.'
+        description: 'The container to dispatch'
       - type: Boolean
         name: debug
         title: Debug?
@@ -228,7 +250,7 @@ providers:
       - type: Integer
         name: blkio-weight
         title: 'blkio-weight'
-        description: 'Block IO weight (relative weight) accepts a weight value between 10 and 1000.'
+        description: 'Block IO weight (relative weight) accepts a weight value between 10 and 1000'
       - type: String
         name: cap-add
         title: 'cap-add'
@@ -281,7 +303,7 @@ providers:
       - type: String
         name: env
         title: 'environment variables'
-        description: 'Set of environment variables.'
+        description: 'Set of environment variables'
       - type: String
         name: image
         title: 'image'
@@ -314,6 +336,10 @@ providers:
         title: 'memory-swap'
         description: 'Total memory limit (memory + swap, format: <number><optional unit>, where unit = b, k, m or g)'
       - type: String
+        name: mount
+        title: 'mount'
+        description: 'Attach a filesystem mount to the container'
+      - type: String
         name: name
         title: 'name'
         description: 'The identifying name'
@@ -325,7 +351,7 @@ providers:
       - type: Select
         name: oom-kill-disable
         title: 'oom-kill-disable'
-        description: 'Whether to disable OOM Killer for the container or not.'
+        description: 'Whether to disable OOM Killer for the container or not'
         values: true,false
       - type: Select
         name: privileged

@@ -31,7 +31,7 @@ possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'ipc', 'label', 'log-driver', 'log-opt', 'lxc-conf', 'memory',
                  'memory-swap', 'name', 'net', 'oom-kill-disable', 'publish',
                  'privileged', 'restart', 'rm', 'security-opt', 'volume',
-                 'volume-from', 'ulimit', 'uts', 'tty', 'workdir', 'user']
+                 'volume-from', 'ulimit', 'uts', 'tty', 'workdir', 'user', 'mount']
 OPTIONS = []
 
 for env_var_name, env_var_value in os.environ.iteritems():
@@ -76,14 +76,11 @@ else:
 if args.command in {'${option.command}', '${config.command}'}:
     args.command = None
 
-COMMAND = ['docker', 'run']
-COMMAND.extend(OPTIONS)
-COMMAND.append(args.image)
+if args.command:
+    command_string = "docker run %s %s sh -c '%s'" % (' '.join(OPTIONS), args.image, args.command)
+else:
+    command_string = "docker run %s %s" % (' '.join(OPTIONS), args.image)
 
-if args.command is not None:
-    COMMAND.append(args.command)
-
-command_string = " ".join(COMMAND)
 log.debug("Executing: '%s' ..." % command_string)
 
 p = Popen(
