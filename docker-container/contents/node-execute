@@ -22,9 +22,21 @@ parser = argparse.ArgumentParser(
     description='Execute a command string in the container.'
 )
 parser.add_argument('container', help='the container ID')
-parser.add_argument('user', help='the user ID')
 parser.add_argument('command', help='the command string to execute')
 args = parser.parse_args()
+
+possible_opts = ['detach', 'env', 'interactive', 'privileged', 'tty', 'user']
+OPTIONS = []
+
+for opt in possible_opts:
+    env_var_name = "RD_CONFIG_%s" % opt.upper().replace('-', '_')
+    if env_var_name in os.environ:
+        for env_var_value in shlex.split(os.environ[env_var_name]):
+            OPTIONS.append("--%s='%s'" % (opt, env_var_value))
+            log.debug("appended option: --%s='%s'" % (opt, env_var_value))
+
+if 'RD_CONFIG_DOCKER_HOST' in os.environ:
+    os.environ['DOCKER_HOST'] = os.environ['RD_CONFIG_DOCKER_HOST']
 
 if 'RD_CONFIG_DOCKER_HOST' in os.environ:
     os.environ['DOCKER_HOST'] = os.environ['RD_CONFIG_DOCKER_HOST']
@@ -48,13 +60,12 @@ else:
         'RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.'
     )
 
-log.debug(
-    "Executing command string '%s' in container '%s'"
-    "..." % (args.command, args.container)
-)
+command_string = "docker exec %s %s sh -c '%s'" % (' '.join(OPTIONS), args.container, args.command)
+
+log.debug("Executing: '%s' ..." % command_string)
 
 p = Popen(
-    shlex.split('docker exec %s %s' % (args.container, args.command)),
+    shlex.split(command_string),
     shell=False,
     stdout=PIPE,
     stderr=STDOUT
