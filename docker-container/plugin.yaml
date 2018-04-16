@@ -290,7 +290,7 @@ providers:
       - type: Select
         name: detach
         title: 'detach'
-        description: 'Detached mode: run command in the background'
+        description: 'Run container in background and print container ID'
         values: true,false
       - type: String
         name: device
