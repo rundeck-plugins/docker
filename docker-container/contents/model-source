@@ -53,18 +53,18 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
             ip=value["IPAddress"]
 
     default_settings = {
-        'default:Id': json[0]["Id"],
-        'default:Created': json[0]["Created"],
-        'default:Name': json[0]["Name"],
-        'default:Image': json[0]["Image"],
-        'default:State.Status': json[0]["State"]["Status"],
-        'default:State.Pid': json[0]["State"]["Pid"],
-        'default:State.StartedAt': json[0]["State"]["StartedAt"],
-        'default:Config.Image': json[0]["Config"]["Image"],
-        'default:Config.Hostname': json[0]["Config"]["Hostname"],
-        'default:Config.Cmd': json[0]["Config"]["Cmd"][0],
-        'default:Config.Labels': json[0]["Config"]["Labels"],
-        'default:IPAddress': ip,
+        'docker:Id': json[0]["Id"],
+        'docker:Created': json[0]["Created"],
+        'docker:Name': json[0]["Name"],
+        'docker:Image': json[0]["Image"],
+        'docker:State.Status': json[0]["State"]["Status"],
+        'docker:State.Pid': json[0]["State"]["Pid"],
+        'docker:State.StartedAt': json[0]["State"]["StartedAt"],
+        'docker:Config.Image': json[0]["Config"]["Image"],
+        'docker:Config.Hostname': json[0]["Config"]["Hostname"],
+        'docker:Config.Cmd': json[0]["Config"]["Cmd"][0],
+        'docker:Config.Labels': json[0]["Config"]["Labels"],
+        'docker:IPAddress': ip,
     }
 
     mappings = []
@@ -85,7 +85,7 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
                     custom_attribute=None
                     
                     #take the values from default
-                    if "default:" in value:
+                    if "docker:" in value:
                         custom_attribute=default_settings[value]
                     else:
                     #taking the values from docker inspect

@@ -29,29 +29,29 @@ With the "Custom Mapping" option, you can use the default attributes getting fro
 The default mapping values are:
 
 ```
-'default:Id': Container ID,
-'default:Created': Created Date,
-'default:Name': Container Name,
-'default:Image': Container Image ID,
-'default:State.Status': Container Statis,
-'default:State.Pid':  Container PID,
-'default:State.StartedAt': Container Started At,
-'default:Config.Image': Container Image Name,
-'default:Config.Hostname': Container Hostname,
-'default:Config.Cmd': Container Command,
-'default:Config.Labels': Container Labels,
-'default:IPAddress': Container IP,
+'docker:Id': Container ID,
+'docker:Created': Created Date,
+'docker:Name': Container Name,
+'docker:Image': Container Image ID,
+'docker:State.Status': Container Statis,
+'docker:State.Pid':  Container PID,
+'docker:State.StartedAt': Container Started At,
+'docker:Config.Image': Container Image Name,
+'docker:Config.Hostname': Container Hostname,
+'docker:Config.Cmd': Container Command,
+'docker:Config.Labels': Container Labels,
+'docker:IPAddress': Container IP,
 ```
 
-By default, these values will be mapped to the `default` group attributes on nodes. The nodename and hostname will be taken from `default:Id` and `default:Config.Hostname`. 
+By default, these values will be mapped to the `docker` group attributes on nodes. The nodename and hostname will be taken from `docker:Id` and `docker:Config.Hostname`. 
 
 To change these values you can use something like this:
 
 ```
-nodename.selector=default:Name,hostname.selector=default:IPAddress
+nodename.selector=docker:Name,hostname.selector=docker:IPAddress
 ```
 
-This will define the `nodename` attribute with the value of `default:Name` and `hostname`  attribute with the value of `default:IPAddress`
+This will define the `nodename` attribute with the value of `docker:Name` and `hostname`  attribute with the value of `docker:IPAddress`
 
 
 ### Mapping attributes from `docker inspect` result.
@@ -72,6 +72,6 @@ This will add the attributes `StartedAt` and `FinishedAt` on the node definition
 
 With the "Tag" option, you can generate tags based on the value of the default parameters, eg:
 
-`tag.selector=default:Config.Image`
+`tag.selector=docker:Config.Image`
 
 This example will add a tag with the value of the parameter `Config.Image`

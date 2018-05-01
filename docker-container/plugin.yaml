@@ -11,7 +11,7 @@ providers:
     plugin-type: script
     script-interpreter: python -u
     script-file: node-execute
-    script-args: ${config.container} ${config.user} ${config.command}
+    script-args: ${config.container} ${config.user}
     config:
       - type: String
         name: container
@@ -62,7 +62,7 @@ providers:
     plugin-type: script
     script-interpreter: python -u
     script-file: node-execute
-    script-args: ${node.docker:Id} ${node.username} ${exec.command}
+    script-args: ${node.docker:Id} ${node.username}
     config:
       - type: String
         name: docker-cert-path
@@ -115,11 +115,11 @@ providers:
       - type: String
         name: mapping
         title: 'Custom Mapping'
-        description: 'Custom mapping, eg: nodename.selector=default:Name,hostname.selector=default:IPAddress'
+        description: 'Custom mapping, eg: nodename.selector=docker:Name,hostname.selector=docker:IPAddress'
       - type: String
         name: tags
         title: Tags
-        description: 'List of tags. You can add custom, eg: tag.selector=default:Config.Image'
+        description: 'List of tags. You can add custom, eg: tag.selector=docker:Config.Image'
       - type: Boolean
         name: debug
         title: Debug?

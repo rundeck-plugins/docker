@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument('container', help='the container ID')
 parser.add_argument('user', help='the user ID')
-parser.add_argument('command', help='the command string to execute')
+#parser.add_argument('command', help='the command string to execute')
 args = parser.parse_args()
 
 if 'RD_CONFIG_DOCKER_HOST' in os.environ:
@@ -48,16 +48,29 @@ else:
         'RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.'
     )
 
+command = None
+
+if 'RD_EXEC_COMMAND' in os.environ:
+    command = os.environ['RD_EXEC_COMMAND']
+else:
+    command = os.environ['RD_CONFIG_COMMAND']
+
+if command is None:
+    log.error('Command was not set')
+    sys.exit(1)
+
+
 log.debug(
     "Executing command string '%s' in container '%s'"
-    "..." % (args.command, args.container)
+    "..." % (command, args.container)
 )
 
+
 p = Popen(
-    shlex.split('docker exec %s %s' % (args.container, args.command)),
-    shell=False,
+    'docker exec %s %s' % (args.container, command),
     stdout=PIPE,
-    stderr=STDOUT
+    stderr=STDOUT,
+    shell=True
 )
 
 # Print lines to stdout while waiting for command to finish
