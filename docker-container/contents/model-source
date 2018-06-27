@@ -62,10 +62,12 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
         'docker:State.StartedAt': json[0]["State"]["StartedAt"],
         'docker:Config.Image': json[0]["Config"]["Image"],
         'docker:Config.Hostname': json[0]["Config"]["Hostname"],
-        'docker:Config.Cmd': json[0]["Config"]["Cmd"][0],
         'docker:Config.Labels': json[0]["Config"]["Labels"],
-        'docker:IPAddress': ip,
+        'docker:IPAddress': ip
     }
+
+    if(json[0]["Config"]["Cmd"]):
+        default_settings['docker:Config.Cmd']=json[0]["Config"]["Cmd"][0]
 
     mappings = []
     custom_attributes={}
@@ -115,7 +117,8 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
     if custom_attributes:
         data = dict(data.items() + custom_attributes.items())
 
-    data.update(dict(token.split('=') for token in shlex.split(defaults)))
+    if defaults:
+        data.update(dict(token.split('=') for token in shlex.split(defaults)))
 
     return data
 
@@ -151,10 +154,14 @@ else:
         'RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.'
     )
 
-mappingList=None
+mappingList = None
+filter = None
+defaults = None
 
 if 'RD_CONFIG_MAPPING' in os.environ:
     mappingList= os.environ['RD_CONFIG_MAPPING']
+if 'RD_CONFIG_ATTRIBUTES' in os.environ:
+    defaults = os.environ['RD_CONFIG_ATTRIBUTES']
 
 log.debug('Mapping: %s' % mappingList)
 
@@ -192,7 +199,7 @@ for container in containers:
     node_data = nodeCollectData(
         container.rstrip('\n'),
         inspect_json,
-        args.defaults,
+        defaults,
         args.tags,
         mappingList
     )
