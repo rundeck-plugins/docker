@@ -120,6 +120,10 @@ providers:
         name: tags
         title: Tags
         description: 'List of tags. You can add custom, eg: tag.selector=docker:Config.Image'
+      - type: String
+        name: filter
+        title: Filter
+        description: 'Filter the list of containers, eg: name=rundeck*,status=running'
       - type: Boolean
         name: debug
         title: Debug?

@@ -159,16 +159,30 @@ filter = None
 defaults = None
 
 if 'RD_CONFIG_MAPPING' in os.environ:
-    mappingList= os.environ['RD_CONFIG_MAPPING']
+    mappingList = os.environ['RD_CONFIG_MAPPING']
+
+if 'RD_CONFIG_FILTER' in os.environ:
+    filter = os.environ['RD_CONFIG_FILTER']
+
 if 'RD_CONFIG_ATTRIBUTES' in os.environ:
     defaults = os.environ['RD_CONFIG_ATTRIBUTES']
 
 log.debug('Mapping: %s' % mappingList)
 
 # Get a listing of the docker containers
-log.debug('Executing `docker ps --format {{.ID}}` ...')
+
+ps_command=["docker","ps","--format",'"{{.ID}}"']
+
+if filter:
+    for value in filter.split(","):
+        ps_command.append("--filter")
+        ps_command.append(value)
+
+log.debug('Executing `%s` ...' % ' '.join(ps_command))
+
+
 ps = Popen(
-    'docker ps --format "{{.ID}}"',
+    ' '.join(ps_command),
     shell=True,
     stdout=PIPE,
     stderr=PIPE,
