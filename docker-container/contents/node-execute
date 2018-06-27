@@ -65,9 +65,22 @@ log.debug(
     "..." % (command, args.container)
 )
 
+ps_command=["docker","exec"]
+
+if args.user:
+    ps_command.append("--user")
+    ps_command.append(args.user)
+
+ps_command.append(args.container)
+ps_command.append(command)
+
+log.debug(
+    "Executing command string '%s' "
+    "..." % (' '.join(ps_command))
+)
 
 p = Popen(
-    'docker exec %s %s' % (args.container, command),
+    ' '.join(ps_command),
     stdout=PIPE,
     stderr=STDOUT,
     shell=True

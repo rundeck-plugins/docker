@@ -28,7 +28,7 @@ providers:
         title: 'User'
         description: 'User to execute command as.'
         default: root
-        required: true
+        required: false
       - type: Boolean
         name: debug
         title: Debug?
