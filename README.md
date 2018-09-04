@@ -16,8 +16,8 @@ Three providers in this plugin:
 
 Run the following commands to install the plugins:
 
-    zip -r docker-container.zip docker-container
-    cp docker-container.zip $RDECK_BASE/libext
+    gradle build
+    cp build/libs/docker-container-X.Y.Z.zip $RDECK_BASE/libext
 
 
 ## Resource Model Mapping and Tags
