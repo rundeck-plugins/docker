@@ -53,6 +53,9 @@ nodename.selector=docker:Name,hostname.selector=docker:IPAddress
 
 This will define the `nodename` attribute with the value of `docker:Name` and `hostname`  attribute with the value of `docker:IPAddress`
 
+Also, "dynamic" default values can be defined depending of an attribute of the docker container, for example: "docker-shell.<image:tag>.default=sh" or just "docker-shell.default=bash to apply it to all nodes"
+
+
 
 ### Mapping attributes from `docker inspect` result.
 
@@ -75,3 +78,20 @@ With the "Tag" option, you can generate tags based on the value of the default p
 `tag.selector=docker:Config.Image`
 
 This example will add a tag with the value of the parameter `Config.Image`
+
+
+## Node Executor and File Copier
+
+Node Executor includes an attribute to define the custom shell used to execute commands on the remote steps. 
+The options are: bash, sh
+
+This is needed for the File Copier plugin (a default shell is needed when the file is copied to the container).
+
+To define this parameter per container, you can use the mapping attributes on the resource model like:
+
+```
+docker-shell.default=bash
+docker-shell.<image1:tag>.default=sh
+docker-shell.<image2:tag>.default=sh
+```
+
