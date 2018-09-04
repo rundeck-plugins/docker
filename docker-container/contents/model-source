@@ -5,6 +5,7 @@ import shlex
 import sys
 import os
 import json
+import re
 from subprocess import Popen, PIPE
 
 if os.environ.get('RD_CONFIG_DEBUG') == 'true':
@@ -39,10 +40,79 @@ class JsonQuery(dict):
         return val
 
 
+def getMapping(mappingList, default_settings, json):
+    mappings = []
+    custom_attributes = {}
+    log.debug('Mapping: %s' % mappingList)
+
+    if "\n" in mappingList:
+        mappings.extend(mappingList.split('\n\t *'))
+    else:
+        mappings.extend(mappingList.split(','))
+
+    for mapping in mappings:
+        mapping_array = dict(s.split('=', 1) for s in mapping.split())
+        log.debug('mapping_array: %s' % mapping_array)
+
+        for key, value in mapping_array.items():
+
+            log.debug("key: %s, value: %s" % (key, value))
+            if ".selector" in key:
+                log.debug("checking selector %s %s" % (key, value))
+                attribute = key.replace(".selector", "")
+                custom_attribute = None
+
+                # take the values from default
+                if "docker:" in value:
+                    custom_attribute = default_settings[value]
+                else:
+                    # taking the values from docker inspect
+                    for item in json:
+                        custom_attribute = JsonQuery(item).get(value)
+
+                if custom_attribute:
+                    custom_attributes[attribute] = custom_attribute
+
+            if ".default" in key:
+                log.debug("checking defaults %s %s" % (key, value))
+
+                match = re.match("^([^.]+?)\.([^.]+?)\.default", key)
+
+                attribute = None
+                filter = None
+
+                if match is not None:
+                    log.debug(" number match: %s" % len(match.groups()))
+
+                    log.debug(" group1: %s" % match.group(1))
+                    log.debug(" group2: %s" % match.group(2))
+
+                    attribute = match.group(1)
+                    filter = match.group(2)
+
+                match = re.match("^([^.]+?)\.default", key)
+
+                if match is not None:
+                    log.debug(" number match: %s" % len(match.groups()))
+                    log.debug(" group1: %s" % match.group(1))
+
+                    attribute = match.group(1)
+
+                if filter is None:
+
+                    if attribute not in custom_attributes:
+                        custom_attributes[attribute] = value
+                else:
+                    # dataFilter = JsonQuery(item).get(filter)
+                    if filter in default_settings.values():
+                        custom_attributes[attribute] = value
+                        log.debug("     dataFilter: %s, value: %s" % (filter, value))
+
+    return custom_attributes
+
+
 def nodeCollectData(containerId, json, defaults, taglist, mappingList):
     log.debug('Parsing json data for container: %s' % containerId)
-    tags = []
-    tags.extend(taglist.split(','))
 
     ip=json[0]["NetworkSettings"]["IPAddress"]
 
@@ -69,50 +139,33 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
     if(json[0]["Config"]["Cmd"]):
         default_settings['docker:Config.Cmd']=json[0]["Config"]["Cmd"][0]
 
-    mappings = []
-    custom_attributes={}
-
-    #custom mapping attributes
-    if mappingList:
-        log.debug('Mapping: %s' % mappingList)
-        mappings.extend(mappingList.split(','))
-
-        for mapping in mappings:
-            mapping_array = dict(s.split('=', 1) for s in mapping.split())
-
-            for key, value in mapping_array.items():
-                if key.find(".selector"):
-
-                    attribute= key.replace(".selector" ,"")
-                    custom_attribute=None
-                    
-                    #take the values from default
-                    if "docker:" in value:
-                        custom_attribute=default_settings[value]
-                    else:
-                    #taking the values from docker inspect
-                        for item in json:
-                            custom_attribute=JsonQuery(item).get(value)
-
-                    if custom_attribute:
-                        custom_attributes[attribute] = custom_attribute
-
-        log.debug('Custom Attributes: %s' % custom_attributes)
-
     # rundeck attributes
     data = default_settings
-    data['nodename']=containerId
-    data['hostname']=json[0]["Config"]["Hostname"]
-    
+    data['nodename'] = containerId
+    data['hostname'] = json[0]["Config"]["Hostname"]
+
+    tags = []
+
+    if "," in taglist:
+        tags.extend(taglist.split(','))
+    else:
+        tags.extend(taglist.split(' '))
+
     final_tags = ['docker']
-    for tag in tags:        
+    for tag in tags:
         if "tag.selector=" in tag:
-            custom_tag=data[tag.replace("tag.selector=" ,"")]
+            custom_tag = data[tag.replace("tag.selector=", "")]
             final_tags.append(custom_tag)
         else:
             final_tags.append(tag)
 
     data['tags'] = ','.join(final_tags)
+
+    #custom mapping attributes
+    if mappingList:
+        custom_attributes = getMapping(mappingList, default_settings, json)
+
+        log.debug('Custom Attributes: %s' % custom_attributes)
 
     if custom_attributes:
         data = dict(data.items() + custom_attributes.items())

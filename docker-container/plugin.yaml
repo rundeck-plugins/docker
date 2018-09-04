@@ -64,6 +64,16 @@ providers:
     script-file: node-execute
     script-args: ${node.docker:Id} ${node.username}
     config:
+      - type: Select
+        name: shell
+        title: Shell
+        description: Remote shell used to execute the command. In order to use Inline Scripts steps, this attribute is needed.This value can be overwrited on node level using docker-shell attribute
+        values:
+        - bash
+        - sh
+        scope: Instance
+        renderingOptions:
+           instance-scope-node-attribute: "docker-shell"
       - type: String
         name: docker-cert-path
         title: 'docker-cert-path'
@@ -81,6 +91,32 @@ providers:
         name: container
         title: 'container'
         description: 'The container to dispatch.'
+      - type: Boolean
+        name: debug
+        title: Debug?
+        description: 'Write debug messages to stderr'
+  - name: docker-container-file-copier
+    service: FileCopier
+    title: docker-container-file-copier
+    description: 'Dispatch script to an existing container'
+    plugin-type: script
+    script-interpreter: python -u
+    script-file: file-copier
+    script-args: ${node.docker:Id} ${file-copy.file} ${file-copy.destination}
+    config:
+      - type: String
+        name: docker-cert-path
+        title: 'docker-cert-path'
+        description: 'The certificate path'
+      - type: String
+        name: docker-host
+        title: 'docker-host'
+        description: 'The docker host'
+      - type: Select
+        name: docker-tls-verify
+        title: 'docker-tls-verify'
+        description: 'Verify TLS'
+        values: true
       - type: Boolean
         name: debug
         title: Debug?
@@ -111,15 +147,17 @@ providers:
       - type: String
         name: attributes
         title: 'Default attributes'
-        description: 'List of key=value pairs'
+        description: 'List of key=value pairs (space separated). For example: "username=root osFamily=linux"'
       - type: String
         name: mapping
         title: 'Custom Mapping'
-        description: 'Custom mapping, eg: nodename.selector=docker:Name,hostname.selector=docker:IPAddress'
+        description: 'Custom mapping (new line separated or comma separated), eg: nodename.selector=docker:Name,hostname.selector=docker:IPAddress. You can also add default values depending of an attribute of the docker container, for example: "docker-shell.<image:tag>.default=sh" or just "docker-shell.default=bash to apply it to all nodes"'
+        renderingOptions:
+          displayType: MULTI_LINE
       - type: String
         name: tags
         title: Tags
-        description: 'List of tags. You can add custom, eg: tag.selector=docker:Config.Image'
+        description: 'List of tags (space separated or comma separated). You can add custom, eg: tag.selector=docker:Config.Image'
       - type: String
         name: filter
         title: Filter

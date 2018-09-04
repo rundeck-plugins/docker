@@ -1,0 +1,63 @@
+#!/usr/bin/env python -u
+import argparse
+import logging
+import sys
+import os
+from subprocess import Popen, PIPE, STDOUT
+
+if os.environ.get('RD_CONFIG_DEBUG') == 'true':
+    log_level = 'DEBUG'
+else:
+    log_level = 'ERROR'
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=getattr(logging, log_level),
+    format='%(levelname)s: %(name)s: %(message)s'
+)
+log = logging.getLogger('docker-file-copier')
+
+parser = argparse.ArgumentParser(
+    description='Execute a command string in the container.'
+)
+parser.add_argument('container', help='the container ID')
+parser.add_argument('source', help='Source File')
+parser.add_argument('destination', help='Destination File')
+
+args = parser.parse_args()
+
+if 'RD_CONFIG_DOCKER_HOST' in os.environ:
+    os.environ['DOCKER_HOST'] = os.environ['RD_CONFIG_DOCKER_HOST']
+
+if 'RD_CONFIG_DOCKER_CERT_PATH' in os.environ:
+    os.environ['DOCKER_CERT_PATH'] = os.environ['RD_CONFIG_DOCKER_CERT_PATH']
+
+if 'RD_CONFIG_DOCKER_TLS_VERIFY' in os.environ:
+    os.environ['DOCKER_TLS_VERIFY'] = os.environ['RD_CONFIG_DOCKER_TLS_VERIFY']
+
+ps_command=["docker","cp"]
+ps_command.append(args.source)
+ps_command.append(args.container + ":" + args.destination)
+
+p = Popen(
+    ' '.join(ps_command),
+    stdout=PIPE,
+    stderr=STDOUT,
+    shell=True
+)
+
+# Print lines to stdout while waiting for command to finish
+while True:
+    line = p.stdout.readline().rstrip()
+    if line:
+        print line
+    if p.poll() is not None:
+        break
+
+exitcode = p.poll()
+
+if exitcode != 0:
+    log.error('Command execution failed with exit code: %s' % str(exitcode))
+
+# done
+sys.exit(exitcode)
