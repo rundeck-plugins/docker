@@ -167,8 +167,8 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
 
         log.debug('Custom Attributes: %s' % custom_attributes)
 
-    if custom_attributes:
-        data = dict(data.items() + custom_attributes.items())
+        if custom_attributes:
+            data = dict(data.items() + custom_attributes.items())
 
     if defaults:
         data.update(dict(token.split('=') for token in shlex.split(defaults)))
