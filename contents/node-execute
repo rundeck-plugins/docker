@@ -97,7 +97,7 @@ p = Popen(
 while True:
     line = p.stdout.readline().rstrip()
     if line:
-        print line
+        print(line.decode())
     if p.poll() is not None:
         break
 

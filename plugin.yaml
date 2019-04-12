@@ -130,7 +130,7 @@ providers:
     plugin-type: script
     script-interpreter: python -u
     script-file: model-source
-    script-args: ${config.attributes} ${config.tags}
+    script-args: ${config.attributes}
     config:
       - type: String
         name: docker-cert-path
@@ -162,7 +162,7 @@ providers:
       - type: String
         name: filter
         title: Filter
-        description: 'Filter the list of containers, eg: name=rundeck*,status=running'
+        description: 'Filter the list of containers (docker ps --filter syntax), eg: name=rundeck*,status=running. Further information here: https://docs.docker.com/engine/reference/commandline/ps/'
       - type: Boolean
         name: debug
         title: Debug?

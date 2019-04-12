@@ -161,6 +161,7 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
 
     data['tags'] = ','.join(final_tags)
 
+    custom_attributes = None
     #custom mapping attributes
     if mappingList:
         custom_attributes = getMapping(mappingList, default_settings, json)
@@ -168,7 +169,7 @@ def nodeCollectData(containerId, json, defaults, taglist, mappingList):
         log.debug('Custom Attributes: %s' % custom_attributes)
 
     if custom_attributes:
-        data = dict(data.items() + custom_attributes.items())
+        data = dict(list(data.items()) + list(custom_attributes.items()))
 
     if defaults:
         data.update(dict(token.split('=') for token in shlex.split(defaults)))
@@ -181,7 +182,6 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument('defaults', help='key=value list')
-parser.add_argument('tags', help='comma separated list of additonal tags')
 
 args = parser.parse_args()
 
@@ -207,9 +207,10 @@ else:
         'RD_CONFIG_DOCKER_TLS_VERIFY environment variable not defined.'
     )
 
-mappingList = None
+mappingList = ""
 filter = None
-defaults = None
+defaults = ""
+tags = ""
 
 if 'RD_CONFIG_MAPPING' in os.environ:
     mappingList = os.environ['RD_CONFIG_MAPPING']
@@ -220,7 +221,13 @@ if 'RD_CONFIG_FILTER' in os.environ:
 if 'RD_CONFIG_ATTRIBUTES' in os.environ:
     defaults = os.environ['RD_CONFIG_ATTRIBUTES']
 
+if 'RD_CONFIG_TAGS' in os.environ:
+    tags = os.environ['RD_CONFIG_TAGS']
+
+
 log.debug('Mapping: %s' % mappingList)
+log.debug('defaults: %s' % defaults)
+log.debug('filter: %s' % filter)
 
 # Get a listing of the docker containers
 
@@ -267,7 +274,7 @@ for container in containers:
         container.rstrip('\n'),
         inspect_json,
         defaults,
-        args.tags,
+        tags,
         mappingList
     )
     node_set.append(node_data)
