@@ -117,7 +117,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: true
+        values: true,
       - type: Boolean
         name: debug
         title: Debug?
