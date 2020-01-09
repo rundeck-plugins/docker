@@ -326,6 +326,10 @@ providers:
         title: 'environment variables'
         description: 'Set of environment variables.'
       - type: String
+        name: env-file
+        title: 'file with environment variables'
+        description: 'Set path of file with environment variables.'
+      - type: String
         name: image
         title: 'image'
         description: 'The container image identifier'
