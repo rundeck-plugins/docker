@@ -58,7 +58,7 @@ if log_level == 'DEBUG':
     log.debug("Command execution stdout: '%s' ..." % p.stdout.read())
     log.debug("Command execution stderr: '%s' ..." % p.stderr.read())
 else:
-    print(p.stdout.read())
+    print(p.stdout.read().decode())
 
 if exitcode != 0:
     log.error('Command execution failed with exit code: %s' % str(exitcode))

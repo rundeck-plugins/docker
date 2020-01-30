@@ -5,6 +5,7 @@ import shlex
 import sys
 import os
 from subprocess import Popen, PIPE, STDOUT
+import threading
 
 if os.environ.get('RD_CONFIG_DEBUG') == 'true':
     log_level = 'DEBUG'
@@ -17,6 +18,25 @@ logging.basicConfig(
     format='%(levelname)s: %(name)s: %(message)s'
 )
 log = logging.getLogger('docker-run')
+
+
+def stdoutprocess(o):
+   while True:
+      stdoutdata = o.stdout.readline()
+      if stdoutdata:
+         print(stdoutdata.decode())
+      else:
+         break
+
+
+def stderrprocess(o):
+   while True:
+      stderrdata = o.stderr.readline()
+      if stderrdata:
+         log.error(stderrdata.decode())
+      else:
+         break
+
 
 parser = argparse.ArgumentParser(
     description='Start a container with the specified image.'
@@ -34,7 +54,7 @@ possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'volume-from', 'ulimit', 'uts', 'tty', 'workdir', 'user']
 OPTIONS = []
 
-for env_var_name, env_var_value in os.environ.iteritems():
+for env_var_name, env_var_value in os.environ.items():
     if (env_var_name.startswith('RD_OPTION') or
        env_var_name.startswith('RD_NODE') or
        env_var_name.startswith('RD_JOB')) and \
@@ -50,6 +70,13 @@ for opt in possible_opts:
         for env_var_value in shlex.split(os.environ[env_var_name]):
             OPTIONS.append("--%s='%s'" % (opt, env_var_value))
             log.debug("appended option: --%s='%s'" % (opt, env_var_value))
+
+
+detach = False
+if 'RD_CONFIG_DETACH' in os.environ:
+    detachValue = os.environ['RD_CONFIG_DETACH']
+    if detachValue == "true":
+        detach = True
 
 if 'RD_CONFIG_DOCKER_HOST' in os.environ:
     os.environ['DOCKER_HOST'] = os.environ['RD_CONFIG_DOCKER_HOST']
@@ -90,21 +117,45 @@ p = Popen(
     shlex.split(command_string),
     shell=False,
     stdout=PIPE,
-    stderr=STDOUT
+    stderr=PIPE
 )
 
-# Print lines to stdout while waiting for command to finish
-while True:
-    line = p.stdout.readline().rstrip()
-    if line:
-        print line
-    if p.poll() is not None:
-        break
+returncode = 0
+if detach:
+    std_out, std_err = p.communicate()
+    returncode = p.returncode
 
-exitcode = p.poll()
+    if p.returncode != 0:
+        # an error happened!
+        err_msg = "%s. Code: %s" % (std_err.strip().decode(), p.returncode)
+        log.error(err_msg)
 
-if exitcode != 0:
-    log.error('Command execution failed with exit code: %s' % str(exitcode))
+    elif len(std_err):
+        # return code is 0 (no error), but we may want to
+        # do something with the info on std_err
+        # i.e. logger.warning(std_err)
+        log.warn(std_err)
+
+    if returncode == 0:
+        print("id: %s" % std_out.strip().decode())
+else:
+    log.debug("Starting container, waiting for output")
+    #live output
+
+    t = threading.Thread(target=stdoutprocess, args=(p,))
+    t.start()
+    t.join()
+
+    terror = threading.Thread(target=stderrprocess, args=(p,))
+    terror.start()
+    terror.join()
+
+    p.wait()
+
+    returncode = p.returncode
+
+if returncode != 0:
+    log.error('Command execution failed with exit code: %s' % str(returncode))
 
 # done
-sys.exit(exitcode)
+sys.exit(returncode)
