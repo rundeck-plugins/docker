@@ -126,7 +126,7 @@ providers:
     service: ResourceModelSource
     resource-format: resourcejson
     title: docker / container / model
-    description: 'read docker containers as Nodes'
+    description: 'Read docker containers as nodes'
     plugin-type: script
     script-interpreter: python -u
     script-file: model-source
@@ -163,6 +163,10 @@ providers:
         name: filter
         title: Filter
         description: 'Filter the list of containers (docker ps --filter syntax), eg: name=rundeck*,status=running. Further information here: https://docs.docker.com/engine/reference/commandline/ps/'
+      - type: Boolean
+        name: all-containers
+        title: 'All containers'
+        description: 'Include all containers. If unchecked only running containers will be loaded.'
       - type: Boolean
         name: debug
         title: Debug?
