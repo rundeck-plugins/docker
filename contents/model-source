@@ -233,6 +233,9 @@ log.debug('filter: %s' % filter)
 
 ps_command=["docker","ps","--format",'"{{.ID}}"']
 
+if os.environ.get('RD_CONFIG_ALL_CONTAINERS') == 'true':
+    ps_command.append("--all")
+
 if filter:
     for value in filter.split(","):
         ps_command.append("--filter")
