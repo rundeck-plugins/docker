@@ -383,6 +383,11 @@ providers:
         name: publish
         title: 'publish'
         description: 'Publish a container port (eg xxxx:yyyy)'
+      - type: String
+        name: pull
+        title: 'pull'
+        description: 'Pull image before running ("always"|"missing"|"never")'
+        values: always,missing,never
       - type: FreeSelect
         name: restart
         title: 'restart'
