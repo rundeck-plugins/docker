@@ -30,7 +30,7 @@ possible_opts = ['add-host', 'blkio-weight', 'cap-add', 'cap-drop', 'cidfile',
                  'cpu-quota', 'detach', 'device', 'dns', 'env', 'interactive',
                  'ipc', 'label', 'log-driver', 'log-opt', 'lxc-conf', 'memory',
                  'memory-swap', 'name', 'net', 'oom-kill-disable', 'publish',
-                 'privileged', 'read-only', 'restart', 'rm', 'security-opt',
+                 'pull','privileged', 'read-only', 'restart', 'rm', 'security-opt',
                  'volume', 'volume-from', 'ulimit', 'uts', 'tty', 'workdir',
                  'user']
 OPTIONS = []
@@ -38,6 +38,7 @@ OPTIONS = []
 for env_var_name, env_var_value in os.environ.iteritems():
     if (env_var_name.startswith('RD_OPTION') or
        env_var_name.startswith('RD_NODE') or
+       env_var_name.startswith('RD_GLOBALS') or
        env_var_name.startswith('RD_JOB')) and \
        env_var_value:
         OPTIONS.append("--env=%s='%s'" % (env_var_name, env_var_value))
