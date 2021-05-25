@@ -384,6 +384,12 @@ providers:
         title: 'publish'
         description: 'Publish a container port (eg xxxx:yyyy)'
       - type: FreeSelect
+        name: pull
+        title: 'pull'
+        description: 'Pull image before running ("always"|"missing"|"never")'
+        values: always,missing,never
+        default: missing
+      - type: FreeSelect
         name: restart
         title: 'restart'
         description: 'Restart policy to apply when a container exits'
