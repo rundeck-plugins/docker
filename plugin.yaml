@@ -330,6 +330,10 @@ providers:
         title: 'environment variables'
         description: 'Set of environment variables.'
       - type: String
+        name: env-file
+        title: 'file with environment variables'
+        description: 'Set path of file with environment variables (in the filesystem where Rundeck runs).'
+      - type: String
         name: image
         title: 'image'
         description: 'The container image identifier'
@@ -410,7 +414,7 @@ providers:
       - type: String
         name: volume
         title: 'volume'
-        description: 'Bind mount a volume'
+        description: 'Bind mount a volume (from the filesystem where Docker engine runs)'
       - type: String
         name: volumes-from
         title: 'volumes-from'
