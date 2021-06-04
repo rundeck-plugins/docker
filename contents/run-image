@@ -39,6 +39,7 @@ for env_var_name, env_var_value in os.environ.items():
     if (env_var_name.startswith('RD_OPTION') or
        env_var_name.startswith('RD_NODE') or
        env_var_name.startswith('RD_GLOBALS') or
+       env_var_name.startswith('RD_FILE') or
        env_var_name.startswith('RD_JOB')) and \
        env_var_value:
         OPTIONS.append("--env=%s='%s'" % (env_var_name, env_var_value))
