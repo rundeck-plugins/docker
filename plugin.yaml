@@ -52,7 +52,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: true,
+        values: true,false
         renderingOptions:
           grouping: secondary
           groupName: 'API Connection'
@@ -79,15 +79,24 @@ providers:
         name: docker-cert-path
         title: 'docker-cert-path'
         description: 'The certificate path'
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: String
         name: docker-host
         title: 'docker-host'
         description: 'The docker host'
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: Select
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: true,
+        values: true,false
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: String
         name: container
         title: 'container'
@@ -109,15 +118,24 @@ providers:
         name: docker-cert-path
         title: 'docker-cert-path'
         description: 'The certificate path'
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: String
         name: docker-host
         title: 'docker-host'
         description: 'The docker host'
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: Select
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: true
+        values: true,false
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: Boolean
         name: debug
         title: Debug?
@@ -136,15 +154,24 @@ providers:
         name: docker-cert-path
         title: 'docker-cert-path'
         description: 'The certificate path'
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: String
         name: docker-host
         title: 'docker-host'
         description: 'The docker host'
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: Select
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'Verify TLS'
-        values: true,
+        values: true,false
+        renderingOptions:
+          grouping: secondary
+          groupName: 'API Connection'
       - type: String
         name: attributes
         title: 'Default attributes'
@@ -269,190 +296,275 @@ providers:
     script-args: ${config.image} ${config.command}
     config:
       - type: String
-        name: add-host
-        title: 'add-host'
-        description: 'Add a line to /etc/hosts (host:IP)'
-      - type: Integer
-        name: blkio-weight
-        title: 'blkio-weight'
-        description: 'Block IO weight (relative weight) accepts a weight value between 10 and 1000.'
-      - type: String
-        name: cap-add
-        title: 'cap-add'
-        description: 'Add Linux capabilities'
-      - type: String
-        name: cap-drop
-        title: 'cap-drop'
-        description: 'Drop Linux capabilities'
-      - type: String
-        name: cidfile
-        title: 'cidfile'
-        description: 'Write the container ID to the file'
-      - type: String
-        name: command
-        title: 'command'
-        description: 'Run this command at start up'
-      - type: Integer
-        name: cpu-period
-        title: 'cpu-period'
-        description: 'Limit the CPU CFS (Completely Fair Scheduler) period'
-      - type: Integer
-        name: cpu-quota
-        title: 'cpu-quota'
-        description: 'Limit the CPU CFS (Completely Fair Scheduler) quota'
-      - type: Integer
-        name: cpu-shares
-        title: 'cpu-shares'
-        description: 'CPU shares (relative weight)'
-      - type: String
-        name: cpuset-cpus
-        title: 'cpuset-cpus'
-        description: 'CPUs in which to allow execution (0-3, 0,1)'
-      - type: String
-        name: cpuset-mems
-        title: 'cpuset-mems'
-        description: 'Memory nodes (MEMs) in which to allow execution (0-3, 0,1)'
-      - type: Select
-        name: detach
-        title: 'detach'
-        description: 'Run container in background and print container ID'
-        values: true,false
-      - type: String
-        name: device
-        title: 'device'
-        description: 'Allows you to run devices inside the container without the --privileged flag'
-      - type: String
-        name: dns
-        title: 'dns'
-        description: 'Set custom dns servers for the container'
-      - type: String
-        name: env
-        title: 'environment variables'
-        description: 'Set of environment variables.'
-      - type: String
-        name: env-file
-        title: 'file with environment variables'
-        description: 'Set path of file with environment variables (in the filesystem where Rundeck runs).'
+        name: name
+        title: 'name'
+        description: 'The identifying name'
+        renderingOptions:
+          groupName: 'Container'
       - type: String
         name: image
         title: 'image'
         description: 'The container image identifier'
         required: true
-      - type: FreeSelect
-        name: ipc
-        title: 'ipc'
-        description: 'Set the IPC mode for the container'
-        values: host,container:<name|id>
-      - type: Select
-        name: log-driver
-        title: 'log-driver'
-        description: 'Logging driver for container'
-        values: none,json-file,syslog,journald
+        renderingOptions:
+          groupName: 'Container'
       - type: String
-        name: log-opt
-        title: 'log-opt'
-        description: 'Log driver options'
+        name: env
+        title: 'environment variables'
+        description: 'Set of environment variables.'
+        renderingOptions:
+          groupName: 'Container'
       - type: String
-        name: lxc-conf
-        title: 'lxc-conf'
-        description: 'Add custom lxc options'
+        name: env-file
+        title: 'file with environment variables'
+        description: 'Set path of file with environment variables (in the filesystem where Rundeck runs).'
+        renderingOptions:
+          groupName: 'Container'
       - type: String
-        name: memory
-        title: 'memory'
-        description: 'Memory limit (format: <number><optional unit>, where unit = b, k, m or g)'
+        name: volume
+        title: 'volume'
+        description: 'Bind mount a volume (from the filesystem where Docker engine runs)'
+        renderingOptions:
+          groupName: 'Container'
       - type: String
-        name: memory-swap
-        title: 'memory-swap'
-        description: 'Total memory limit (memory + swap, format: <number><optional unit>, where unit = b, k, m or g)'
-      - type: String
-        name: name
-        title: 'name'
-        description: 'The identifying name'
-      - type: FreeSelect
-        name: net
-        title: 'net'
-        description: 'Set the Network mode for the container'
-        values: bridge,none,host,container:<name|id>
-      - type: Select
-        name: oom-kill-disable
-        title: 'oom-kill-disable'
-        description: 'Whether to disable OOM Killer for the container or not.'
-        values: true,false
-      - type: Select
-        name: privileged
-        title: 'privileged'
-        description: 'Give extended privileges to this container'
-        values: true,false
+        name: volumes-from
+        title: 'volumes-from'
+        description: 'Mount volumes from the specified container(s)'
+        renderingOptions:
+          groupName: 'Container'
       - type: String
         name: publish
         title: 'publish'
         description: 'Publish a container port (eg xxxx:yyyy)'
+        renderingOptions:
+          groupName: 'Container'
       - type: FreeSelect
         name: pull
         title: 'pull'
         description: 'Pull image before running ("always"|"missing"|"never")'
         values: always,missing,never
-        default: missing
-      - type: FreeSelect
-        name: restart
-        title: 'restart'
-        description: 'Restart policy to apply when a container exits'
-        values: no,always,on-failure[:max-retries]
+        renderingOptions:
+          groupName: 'Container'
+      - type: String
+        name: cidfile
+        title: 'cidfile'
+        description: 'Write the container ID to the file'
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: command
+        title: 'command'
+        description: 'Run this command at start up'
+        renderingOptions:
+          groupName: 'Running'
       - type: Select
-        name: rm
-        title: 'rm'
-        description: 'Automatically remove the container when it exits'
+        name: detach
+        title: 'detach'
+        description: 'Run container in background and print container ID'
         values: true,false
-      - type: String
-        name: security-opt
-        title: 'security-opt'
-        description: 'Security Options'
-      - type: String
-        name: read-only
-        title: 'read-only'
-        description: 'Mount the containers root filesystem as read only'
-      - type: String
-        name: volume
-        title: 'volume'
-        description: 'Bind mount a volume (from the filesystem where Docker engine runs)'
-      - type: String
-        name: volumes-from
-        title: 'volumes-from'
-        description: 'Mount volumes from the specified container(s)'
-      - type: String
-        name: ulimit
-        title: 'ulimit'
-        description: 'Ulimit options'
-      - type: String
-        name: uts
-        title: 'uts'
-        description: 'UTS namespace to use'
-      - type: String
-        name: label
-        title: 'label'
-        description: 'Set meta data on a container'
-      - type: Select
-        name: interactive
-        title: 'interactive'
-        description: 'Keep STDIN open even if not attached'
-        values: true,false
-      - type: String
-        name: workdir
-        title: 'working-directory'
-        description: 'Working directory inside the container'
-      - type: String
-        name: user
-        title: 'user'
-        description: 'Username or UID (format: <name|uid>[:<group|gid>])'
+        renderingOptions:
+          groupName: 'Running'
       - type: Select
         name: tty
         title: 'tty'
         description: 'Allocate a pseudo-TTY'
         values: true,false
+        renderingOptions:
+          groupName: 'Running'
+      - type: Select
+        name: interactive
+        title: 'interactive'
+        description: 'Keep STDIN open even if not attached'
+        values: true,false
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: add-host
+        title: 'add-host'
+        description: 'Add a line to /etc/hosts (host:IP)'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: Integer
+        name: blkio-weight
+        title: 'blkio-weight'
+        description: 'Block IO weight (relative weight) accepts a weight value between 10 and 1000.'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: String
+        name: cap-add
+        title: 'cap-add'
+        description: 'Add Linux capabilities'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: String
+        name: cap-drop
+        title: 'cap-drop'
+        description: 'Drop Linux capabilities'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: Integer
+        name: cpu-period
+        title: 'cpu-period'
+        description: 'Limit the CPU CFS (Completely Fair Scheduler) period'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: Integer
+        name: cpu-quota
+        title: 'cpu-quota'
+        description: 'Limit the CPU CFS (Completely Fair Scheduler) quota'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: Integer
+        name: cpu-shares
+        title: 'cpu-shares'
+        description: 'CPU shares (relative weight)'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: String
+        name: cpuset-cpus
+        title: 'cpuset-cpus'
+        description: 'CPUs in which to allow execution (0-3, 0,1)'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: String
+        name: cpuset-mems
+        title: 'cpuset-mems'
+        description: 'Memory nodes (MEMs) in which to allow execution (0-3, 0,1)'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: String
+        name: device
+        title: 'device'
+        description: 'Allows you to run devices inside the container without the --privileged flag'
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: dns
+        title: 'dns'
+        description: 'Set custom dns servers for the container'
+        renderingOptions:
+          groupName: 'Network'
+      - type: FreeSelect
+        name: ipc
+        title: 'ipc'
+        description: 'Set the IPC mode for the container'
+        values: host,container:<name|id>
+        renderingOptions:
+          groupName: 'Container'
+      - type: Select
+        name: log-driver
+        title: 'log-driver'
+        description: 'Logging driver for container'
+        values: none,json-file,syslog,journald
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: log-opt
+        title: 'log-opt'
+        description: 'Log driver options'
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: lxc-conf
+        title: 'lxc-conf'
+        description: 'Add custom lxc options'
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: memory
+        title: 'memory'
+        description: 'Memory limit (format: <number><optional unit>, where unit = b, k, m or g)'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: String
+        name: memory-swap
+        title: 'memory-swap'
+        description: 'Total memory limit (memory + swap, format: <number><optional unit>, where unit = b, k, m or g)'
+        renderingOptions:
+          groupName: 'Resources'
+      - type: FreeSelect
+        name: net
+        title: 'net'
+        description: 'Set the Network mode for the container'
+        values: bridge,none,host,container:<name|id>
+        renderingOptions:
+          groupName: 'Network'
+      - type: Select
+        name: oom-kill-disable
+        title: 'oom-kill-disable'
+        description: 'Whether to disable OOM Killer for the container or not.'
+        values: true,false
+        renderingOptions:
+          groupName: 'Running'
+      - type: Select
+        name: privileged
+        title: 'privileged'
+        description: 'Give extended privileges to this container'
+        values: true,false
+        renderingOptions:
+          groupName: 'Running'
+      - type: FreeSelect
+        name: restart
+        title: 'restart'
+        description: 'Restart policy to apply when a container exits'
+        values: no,always,on-failure[:max-retries]
+        renderingOptions:
+          groupName: 'Running'
+      - type: Select
+        name: rm
+        title: 'rm'
+        description: 'Automatically remove the container when it exits'
+        values: true,false
+        renderingOptions:
+          groupName: 'Running'
+      - type: String
+        name: security-opt
+        title: 'security-opt'
+        description: 'Security Options'
+        renderingOptions:
+          groupName: 'Container'
+      - type: String
+        name: read-only
+        title: 'read-only'
+        description: 'Mount the containers root filesystem as read only'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: String
+        name: ulimit
+        title: 'ulimit'
+        description: 'Ulimit options'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: String
+        name: uts
+        title: 'uts'
+        description: 'UTS namespace to use'
+        renderingOptions:
+          groupName: 'OS Config'
+      - type: String
+        name: label
+        title: 'label'
+        description: 'Set meta data on a container'
+        renderingOptions:
+          groupName: 'Container'
+      - type: String
+        name: workdir
+        title: 'working-directory'
+        description: 'Working directory inside the container'
+        renderingOptions:
+          groupName: 'Container'
+      - type: String
+        name: user
+        title: 'user'
+        description: 'Username or UID (format: <name|uid>[:<group|gid>])'
+        renderingOptions:
+          groupName: 'Container'
       - type: Boolean
         name: debug
         title: Debug?
         description: 'Write debug messages to stderr'
+        renderingOptions:
+          groupName: 'Step Options'
       - type: String
         name: docker-cert-path
         title: 'docker-cert-path'
@@ -471,7 +583,7 @@ providers:
         name: docker-tls-verify
         title: 'docker-tls-verify'
         description: 'verify TLS'
-        values: true,
+        values: true,false
         renderingOptions:
           grouping: secondary
           groupName: 'API Connection'
