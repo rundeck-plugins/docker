@@ -455,7 +455,7 @@ providers:
         name: log-driver
         title: 'log-driver'
         description: 'Logging driver for container'
-        values: none,json-file,syslog,journald
+        values: none,json-file,splunk,syslog,journald
         renderingOptions:
           groupName: 'Running'
       - type: String
