@@ -4,12 +4,12 @@ buildscript {
     }
 }
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.7.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.11.0'
 }
 
 ext.pluginName = 'Docker Plugin'
 ext.pluginDescription = "Docker manager plugin"
-ext.sopsCopyright = "© 2017, Rundeck, Inc."
+ext.sopsCopyright = "© 2022, Rundeck, Inc."
 ext.sopsUrl = "http://rundeck.com"
 ext.buildDateString=new Date().format("yyyy-MM-dd'T'HH:mm:ssX")
 ext.archivesBaseName = "docker-container"
