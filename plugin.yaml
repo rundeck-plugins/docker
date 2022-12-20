@@ -1,4 +1,4 @@
-name: docker-container-node-executor
+name: "@name@"
 rundeckPluginVersion: 1.2
 author: "@author@"
 date: "@date@"
