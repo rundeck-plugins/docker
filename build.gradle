@@ -7,7 +7,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.4'
 }
 
-ext.pluginName = 'Docker Plugin'
+ext.pluginName = 'docker'
 ext.pluginDescription = "Docker manager plugin"
 ext.sopsCopyright = "© 2022, Rundeck, Inc."
 ext.sopsUrl = "http://rundeck.com"
