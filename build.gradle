@@ -4,7 +4,7 @@ buildscript {
     }
 }
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.13.4'
+    id 'pl.allegro.tech.build.axion-release' version '1.17.2'
 }
 
 ext.pluginName = 'Docker Plugin'
@@ -21,14 +21,7 @@ scmVersion {
         prefix = ''
         versionSeparator = ''
         def origDeserialize=deserialize
-        //apend .0 to satisfy semver if the tag version is only X.Y
-        deserialize = { config, position, tagName ->
-            def orig = origDeserialize(config, position, tagName)
-            if (orig.split('\\.').length < 3) {
-                orig += ".0"
-            }
-            orig
-        }
+
     }
 }
 
