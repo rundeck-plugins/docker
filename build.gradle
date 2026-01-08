@@ -1,22 +1,66 @@
-buildscript {
-    repositories {
-        mavenCentral()
+plugins {
+    id 'pl.allegro.tech.build.axion-release' version '1.17.2'
+    id 'maven-publish'
+}
+
+group = 'com.rundeck.plugins'
+
+scmVersion {
+    ignoreUncommittedChanges = false
+    tag {
+        prefix = ''           // NO "v" prefix - see PLUGIN_TAGGING_ARCHITECTURE.md
+        versionSeparator = ''
+    }
+    versionCreator 'simple'  // Use simple version creator (just tag name)
+    checks {
+        uncommittedChanges = false
+    }
+    // Ignore old tags with 'v' prefix from JitPack era
+    repository {
+        customProperty 'tag.matcher', ~/^(?!v).*/
     }
 }
 
-group = 'com.github.rundeck-plugins'
+version = scmVersion.version  // Dynamic version from git tag
 
 ext.pluginName = 'Docker Plugin'
 ext.pluginDescription = "Docker manager plugin"
 ext.sopsCopyright = "© 2022, Rundeck, Inc."
 ext.sopsUrl = "http://rundeck.com"
-ext.buildDateString=new Date().format("yyyy-MM-dd'T'HH:mm:ssX")
+ext.buildDateString = new Date().format("yyyy-MM-dd'T'HH:mm:ssX")
 ext.archivesBaseName = "docker"
 ext.pluginBaseFolder = "."
-
-// Override version for Grails 7 upgrade
-project.version = '1.4.12-grails7-upgrade-test'
 ext.archiveFilename = ext.archivesBaseName + '-' + version
 
 apply from: 'https://raw.githubusercontent.com/rundeck-plugins/build-zip/gradle-5.6/build.gradle'
 
+publishing {
+    publications {
+        mavenZip(MavenPublication) {
+            groupId = 'com.rundeck.plugins'
+            artifactId = 'docker'
+            version = project.version
+            pom.packaging = 'jar'
+            
+            // Publish ONLY the .jar file (tell Maven the .zip is actually a .jar)
+            artifact(pluginZip) {
+                extension = 'jar'
+                classifier = ''
+            }
+        }
+    }
+    
+    repositories {
+        maven {
+            name = "PackageCloudTest"
+            url = uri("https://packagecloud.io/pagerduty/rundeckpro-test/maven2")
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+            credentials(HttpHeaderCredentials) {
+                name = "Authorization"
+                value = "Bearer " + (System.getenv("PKGCLD_WRITE_TOKEN") ?: project.findProperty("pkgcldWriteToken"))
+            }
+        }
+    }
+}
