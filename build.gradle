@@ -1,31 +1,116 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.17.2'
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
 }
 
-ext.pluginName = 'Docker Plugin'
-ext.pluginDescription = "Docker manager plugin"
-ext.sopsCopyright = "© 2022, Rundeck, Inc."
-ext.sopsUrl = "http://rundeck.com"
-ext.buildDateString=new Date().format("yyyy-MM-dd'T'HH:mm:ssX")
-ext.archivesBaseName = "docker"
-ext.pluginBaseFolder = "."
+group = 'org.rundeck.plugins'
 
 scmVersion {
-    ignoreUncommittedChanges = true
+    ignoreUncommittedChanges = false
     tag {
-        prefix = ''
+        prefix = ''           // NO "v" prefix - see PLUGIN_TAGGING_ARCHITECTURE.md
         versionSeparator = ''
-        def origDeserialize=deserialize
-
     }
 }
 
-project.version = scmVersion.version
-ext.archiveFilename = ext.archivesBaseName + '-' + version
+version = scmVersion.version  // Dynamic version from git tag
 
-apply from: 'https://raw.githubusercontent.com/rundeck-plugins/build-zip/gradle-5.6/build.gradle'
+// Plugin metadata
+ext {
+    pluginName = 'Docker Plugin'
+    pluginDescription = "Docker manager plugin"
+    sopsCopyright = "© 2022, Rundeck, Inc."
+    sopsUrl = "http://rundeck.com"
+    buildDateString = new Date().format("yyyy-MM-dd'T'HH:mm:ssX")
+    archivesBaseName = "docker"
+    pluginBaseFolder = "."
+}
+
+ext.archiveFilename = "${archivesBaseName}-${version}"
+ext.publishName = "Docker Plugin ${project.version}"
+ext.githubSlug = 'rundeck-plugins/docker'
+ext.developers = [
+        [id: 'gschueler', name: 'Greg Schueler', email: 'greg@rundeck.com']
+]
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+// Set default tasks
+defaultTasks('clean', 'build', 'pluginZip')
+
+task pluginZip(type: Jar) {
+    archiveBaseName = archivesBaseName
+    archiveVersion = version
+    archiveClassifier = ''
+    archiveExtension = 'zip'
+    destinationDirectory = layout.buildDirectory.dir('libs')
+
+    from(layout.buildDirectory.dir('zip-contents')) {
+        include('*.yaml')
+        include('resources/**')
+        include('contents/*')
+        into("${archivesBaseName}-" + project.version.toString())
+    }
+
+    manifest {
+        attributes(
+            'Rundeck-Plugin-Name': pluginName,
+            'Rundeck-Plugin-Description': pluginDescription,
+            'Rundeck-Plugin-Archive': 'true',
+            'Rundeck-Plugin-File-Version': project.version.toString(),
+            'Rundeck-Plugin-Author': sopsCopyright,
+            'Rundeck-Plugin-URL': sopsUrl,
+            'Rundeck-Plugin-Date': buildDateString
+        )
+    }
+}
+
+pluginZip.doFirst {
+    def assetsMap = new Properties()
+    def tokens = assetsMap + [
+            version    : project.version.toString(),
+            date       : new Date().format("yyyy-MM-dd'T'HH:mm:ssX"),
+            author     : sopsCopyright,
+            url        : sopsUrl,
+            title      : pluginName,
+            description: pluginDescription,
+            name       : archivesBaseName,
+    ]
+
+    copy {
+        from(file('resources')) {
+            include('**/*')
+            into('resources')
+        }
+
+        from(file('contents')) {
+            into('contents')
+        }
+
+        from('plugin.yaml') {
+            filter(ReplaceTokens, tokens: tokens)
+            exclude('**/*.png')
+        }
+
+        into(layout.buildDirectory.dir('zip-contents'))
+    }
+}
+
+nexusPublishing {
+    packageGroup = 'org.rundeck.plugins'
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+        }
+    }
+}
+
+apply from: "${rootDir}/gradle/publishing.gradle"
+
+tasks.named('build').configure { dependsOn(pluginZip) }
+
+task install(dependsOn: ['build', 'publishToMavenLocal']) {
+}
+
+tasks.named('clean').configure { delete('build') }
