@@ -114,13 +114,18 @@ def getMapping(mappingList, default_settings, json):
 def nodeCollectData(containerId, json, defaults, taglist, mappingList):
     log.debug('Parsing json data for container: %s' % containerId)
 
-    ip=json[0]["NetworkSettings"]["IPAddress"]
+    network_settings = json[0].get("NetworkSettings", {})
+    ip = network_settings.get("IPAddress")
 
-    #docker-compose has a different json format
+    #docker-compose has a different json format; also covers containers only
+    #attached to custom networks, where the top-level IPAddress key is absent
+    #entirely rather than just empty (Docker only populates it for the
+    #default bridge network)
     if not ip:
-        networkArray=json[0]["NetworkSettings"]["Networks"]
-        for key, value in networkArray.items():
-            ip=value["IPAddress"]
+        for key, value in network_settings.get("Networks", {}).items():
+            ip = value.get("IPAddress")
+            if ip:
+                break
 
     default_settings = {
         'docker:Id': json[0]["Id"],
