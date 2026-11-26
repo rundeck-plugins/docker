@@ -1,0 +1,16 @@
+Starting a Gradle Daemon, 1 busy and 1 incompatible Daemons could not be reused, use --status for details
+> Task :assemble UP-TO-DATE
+> Task :check UP-TO-DATE
+> Task :pluginZip
+> Task :build
+
+[Incubating] Problems report is available at: file:///Users/ltoledo/development/rundeck-development/plugins/docker/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5s
+1 actionable task: 1 executed
